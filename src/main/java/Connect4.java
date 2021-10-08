@@ -45,21 +45,28 @@ public class Connect4 extends Application {
         return button.getText() == "X" || button.getText().equals("O");
     }
 
-    private int hasEqualRowHelper1(int row, int col, int player) {
-
-    }
-
-    private int hasEqualRowHelper2(int row, int col, int player) {
-
-    }
-
-    public boolean hasEqualRow() {
-        for (GameButton[] row : buttons) {
-            if (hasValue(row[0]) && row[0].getText().equals(row[1].getText()) && row[0].getText().equals(row[2].getText())) {
-                return true;
-            }
+    private int checkLeft(int row, int col) {
+        if (col < 0) {
+            return 0;
+        } else if (buttons[col][row].getPlayer() == player) {
+            return 1 + checkLeft(row, col - 1);
+        } else {
+            return 0;
         }
-        return false;
+    }
+
+    private int checkRight(int row, int col) {
+        if (col > 6) {
+            return 0;
+        } else if (buttons[col][row].getPlayer() == player) {
+            return 1 + checkRight(row, col + 1);
+        } else {
+            return 0;
+        }
+    }
+
+    public boolean hasEqualRow(int row, int col) {
+        return 1 + checkLeft(row, col - 1) + checkRight(row, col + 1) >= 4;
     }
 
     public boolean hasEqualColumn() {
@@ -112,6 +119,7 @@ public class Connect4 extends Application {
     private int dropToValidPosition(int row, int col) {
         int curRow = row;
         while (!isValidPostion(curRow++, col));
+        buttons[col][row].setPlayer(player);
         return curRow-1;
     }
 
@@ -167,6 +175,7 @@ public class Connect4 extends Application {
                         temp.setStyle("-fx-background-color: red");
                         temp.setDisable(true);
                     }
+                    System.out.println(hasEqualRow(row, col));
                     temp.setDisable(true);
                     if (winner()) {
                         endGame();

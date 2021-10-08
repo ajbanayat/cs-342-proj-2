@@ -17,4 +17,12 @@ public class GameButton extends Button {
         super(text, graphic);
         player = 0;
     }
+
+    public int getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(int player) {
+        this.player = player;
+    }
 }
