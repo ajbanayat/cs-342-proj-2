@@ -14,6 +14,8 @@ public class Connect4 extends Application {
     ListView<String> listView;
     GameButton[][] buttons;
     Scene scene;
+    int rows;
+    int cols;
 
     public static void main(String[] args) {
         launch(args);
@@ -29,11 +31,11 @@ public class Connect4 extends Application {
     }
 
     public void newGame() {
-        for (int r = 0; r < 6; r++) {
-            for (int c = 0; c < 7; c++) {
-                buttons[c][r].setText("");
-                buttons[c][r].setDisable(false);
-                buttons[c][r].setStyle("-fx-text-fill: white");
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                buttons[r][c].setText("");
+                buttons[r][c].setDisable(false);
+                buttons[r][c].setStyle("-fx-text-fill: white");
             }
         }
         player = 1;
@@ -48,7 +50,7 @@ public class Connect4 extends Application {
     private int checkLeft(int row, int col) {
         if (col < 0) {
             return 0;
-        } else if (buttons[col][row].getPlayer() == player) {
+        } else if (buttons[row][col].getPlayer() == player) {
             return 1 + checkLeft(row, col - 1);
         } else {
             return 0;
@@ -58,7 +60,7 @@ public class Connect4 extends Application {
     private int checkRight(int row, int col) {
         if (col > 6) {
             return 0;
-        } else if (buttons[col][row].getPlayer() == player) {
+        } else if (buttons[row][col].getPlayer() == player) {
             return 1 + checkRight(row, col + 1);
         } else {
             return 0;
@@ -69,29 +71,28 @@ public class Connect4 extends Application {
         return 1 + checkLeft(row, col - 1) + checkRight(row, col + 1) >= 4;
     }
 
-//    private int checkUp(int row, int col) {
-//        if (row < 0) {
-//            return 0;
-//        } else if (buttons[col][row].getPlayer() == player) {
-//            return 1 + checkUp(row - 1, col);
-//        } else {
-//            return 0;
-//        }
-//    }
-//
-//    private int checkDown(int row, int col) {
-//        if (row > 7) {
-//            return 0;
-//        } else if (buttons[col][row].getPlayer() == player) {
-//            return 1 + checkDown(row + 1, col);
-//        } else {
-//            return 0;
-//        }
-//    }
+    private int checkUp(int row, int col) {
+        if (row < 0) {
+            return 0;
+        } else if (buttons[row][col].getPlayer() == player) {
+            return 1 + checkUp(row - 1, col);
+        } else {
+            return 0;
+        }
+    }
+
+    private int checkDown(int row, int col) {
+        if (row > 7) {
+            return 0;
+        } else if (buttons[row][col].getPlayer() == player) {
+            return 1 + checkDown(row + 1, col);
+        } else {
+            return 0;
+        }
+    }
 
     public boolean hasEqualColumn(int row, int col) {
-//        return 1 + checkUp(row - 1, col) + checkDown(row + 1, col) >= 4;
-        return false;
+        return 1 + checkUp(row - 1, col) + checkDown(row + 1, col) >= 4;
     }
 
     public boolean hasEqualDiagonal() {
@@ -143,19 +144,19 @@ public class Connect4 extends Application {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Tic-Tac-Toe");
 
-        int rows = 6;
-        int cols = 7;
+        rows = 6;
+        cols = 7;
 
         listView = new ListView<>();
-        buttons = new GameButton[7][6];
+        buttons = new GameButton[rows][cols];
 
         GridPane gridPane = new GridPane();
-        for (int c = 0; c < cols; c++) {
-            for (int r = 0; r < rows; r++) {
-                buttons[c][r] = new GameButton();
-                buttons[c][r].setMaxSize(100, 100);
-                buttons[c][r].setMinSize(100, 100);
-                gridPane.add(buttons[c][r], c + 1, r + 1);
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                buttons[r][c] = new GameButton();
+                buttons[r][c].setMaxSize(100, 100);
+                buttons[r][c].setMinSize(100, 100);
+                gridPane.add(buttons[r][c], c + 1, r + 1);
             }
         }
 
@@ -173,13 +174,13 @@ public class Connect4 extends Application {
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                GameButton curButton = buttons[c][r];
+                GameButton curButton = buttons[r][c];
                 int row = r;
                 int col = c;
-                buttons[c][r].setOnAction(actionEvent -> {
+                buttons[r][c].setOnAction(actionEvent -> {
                     int newRow = dropToValidPosition(row, col);
                     System.out.println("newRow: " + newRow);
-                    GameButton temp = buttons[col][newRow];
+                    GameButton temp = buttons[newRow][col];
                     if (player == 1) {
                         temp.setText("X");
                         temp.setStyle("-fx-text-fill: yellow");
