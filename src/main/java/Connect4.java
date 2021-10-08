@@ -16,7 +16,7 @@ public class Connect4 extends Application {
     Scene scene;
     int rows;
     int cols;
-
+    // allison sucks
     public static void main(String[] args) {
         launch(args);
     }
