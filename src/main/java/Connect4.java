@@ -92,7 +92,8 @@ public class Connect4 extends Application {
     }
 
     public boolean hasEqualColumn(int row, int col) {
-        return 1 + checkUp(row - 1, col) + checkDown(row + 1, col) >= 4;
+//        return 1 + checkUp(row - 1, col) + checkDown(row + 1, col) >= 4;
+        return true;
     }
 
     public boolean hasEqualDiagonal() {
@@ -129,14 +130,14 @@ public class Connect4 extends Application {
     }
 
     private boolean isValidPostion(int row, int col) {
-        return (row == 5 || (row < 5 && buttons[col][row+1].isDisable() == true));
+        return (row == 5 || (row < 5 && buttons[row+1][col].isDisable() == true));
 //        return (row < 6 && (buttons[row+1][col].isDisabled() == false));
     }
 
     private int dropToValidPosition(int row, int col) {
         int curRow = row;
         while (!isValidPostion(curRow++, col));
-        buttons[col][row].setPlayer(player);
+        buttons[curRow-1][col].setPlayer(player);
         return curRow-1;
     }
 
@@ -174,7 +175,6 @@ public class Connect4 extends Application {
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                GameButton curButton = buttons[r][c];
                 int row = r;
                 int col = c;
                 buttons[r][c].setOnAction(actionEvent -> {
@@ -192,8 +192,8 @@ public class Connect4 extends Application {
                         temp.setStyle("-fx-background-color: red");
                         temp.setDisable(true);
                     }
-                    System.out.println("for player " + player + ": row -> " + hasEqualRow(row, col));
-                    System.out.println("for player " + player + ": col -> " + hasEqualColumn(row, col));
+                    System.out.println("for player " + player + ": row -> " + hasEqualRow(newRow, col));
+                    System.out.println("for player " + player + ": col -> " + hasEqualColumn(newRow, col));
                     temp.setDisable(true);
                     if (winner()) {
                         endGame();
