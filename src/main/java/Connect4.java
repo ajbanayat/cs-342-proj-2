@@ -82,7 +82,7 @@ public class Connect4 extends Application {
     }
 
     private int checkDown(int row, int col) {
-        if (row > 7) {
+        if (row > 5) {
             return 0;
         } else if (buttons[row][col].getPlayer() == player) {
             return 1 + checkDown(row + 1, col);
@@ -92,8 +92,8 @@ public class Connect4 extends Application {
     }
 
     public boolean hasEqualColumn(int row, int col) {
-//        return 1 + checkUp(row - 1, col) + checkDown(row + 1, col) >= 4;
-        return true;
+        return 1 + checkUp(row - 1, col) + checkDown(row + 1, col) >= 4;
+//        return true;
     }
 
     public boolean hasEqualDiagonal() {
