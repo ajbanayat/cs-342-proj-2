@@ -21,7 +21,7 @@ public class Connect4 extends Application {
         launch(args);
     }
 
-    public void changePlayer () {
+    public void changePlayer() {
         if (player == 1) {
             player = 2;
         } else {
@@ -36,6 +36,7 @@ public class Connect4 extends Application {
                 buttons[r][c].setText("");
                 buttons[r][c].setDisable(false);
                 buttons[r][c].setStyle("-fx-text-fill: white");
+                buttons[r][c].setPlayer(0);
             }
         }
         player = 1;
@@ -58,7 +59,7 @@ public class Connect4 extends Application {
     }
 
     private int checkRight(int row, int col) {
-        if (col > 6) {
+        if (col >= cols) {
             return 0;
         } else if (buttons[row][col].getPlayer() == player) {
             return 1 + checkRight(row, col + 1);
@@ -82,7 +83,7 @@ public class Connect4 extends Application {
     }
 
     private int checkDown(int row, int col) {
-        if (row > 5) {
+        if (row >= rows) {
             return 0;
         } else if (buttons[row][col].getPlayer() == player) {
             return 1 + checkDown(row + 1, col);
@@ -93,29 +94,63 @@ public class Connect4 extends Application {
 
     public boolean hasEqualColumn(int row, int col) {
         return 1 + checkUp(row - 1, col) + checkDown(row + 1, col) >= 4;
-//        return true;
     }
 
-    public boolean hasEqualDiagonal() {
-        if ((hasValue(buttons[0][0]) && buttons[0][0].getText().equals(buttons[1][1].getText()) && buttons[0][0].getText().equals(buttons[2][2].getText())) ||
-                (hasValue(buttons[0][2]) && buttons[0][2].getText().equals(buttons[1][1].getText()) && buttons[0][2].getText().equals(buttons[2][0].getText()))) {
-            return true;
+    public int WonDiagUR(int row, int col) {
+        if ((row < 0 || row > rows) || (col < 0 || col > cols)) return 0;
+        if ((row-1 >= 0 && col+1 < cols) && (buttons[row][col].getPlayer() == buttons[row-1][col+1].getPlayer())) {
+            return 1 + WonDiagUR(row-1, col+1);
         }
-        return false;
+        return 0;
     }
 
-    // can use recursion to check the row
-    public boolean winner() {
-//        return hasEqualRow() || hasEqualColumn() || hasEqualDiagonal();
-        return false;
+    public int WonDiagDL(int row, int col) {
+        if ((row < 0 || row > rows) || (col < 0 || col > cols)) return 0;
+        if ((row+1 < rows && col-1 >= 0) && (buttons[row][col].getPlayer() == buttons[row+1][col-1].getPlayer())) {
+            return 1 + WonDiagDL(row+1, col-1);
+        }
+        return 0;
+    }
+
+    public int WonDiagUL(int row, int col) {
+        if ((row < 0 || row > rows) || (col < 0 || col > cols)) return 0;
+        if ((row-1 >= 0 && col-1 >= 0) && (buttons[row][col].getPlayer() == buttons[row-1][col-1].getPlayer())) {
+            return 1 + WonDiagUR(row-1, col-1);
+        }
+        return 0;
+    }
+
+    public int WonDiagDR(int row, int col) {
+        if ((row < 0 || row > rows) || (col < 0 || col > cols)) return 0;
+        if ((row+1 < rows && col+1 < cols) && (buttons[row][col].getPlayer() == buttons[row+1][col+1].getPlayer())) {
+            return 1 + WonDiagDR(row+1, col+1);
+        }
+        return 0;
+    }
+
+//    public int WonDiagDR(int row, int col) {
+//        if (row < 0 || row > rows || col < 0 || col > cols) return 0;
+//        if (row + 1 < rows && col + 1 < cols && buttons[row][col].getPlayer() == buttons[row+1][col+1].getPlayer()) {
+//            return 1 + Won
+//        }
+//    }
+
+    public boolean WonDiag(int row, int col) {
+        int x = 1 + WonDiagUR(row, col) + WonDiagDL(row, col);
+        int y = 1 + WonDiagUL(row, col) + WonDiagDR(row, col);
+        return  (x >= 4 || y >= 4);
+    }
+
+    public boolean winner(int row, int col) {
+        return hasEqualRow(row, col) || hasEqualColumn(row, col) || WonDiag(row, col);
     }
 
     public void endGame() {
-//        for (int r = 0; r < 3; r++) {
-//            for (int c = 0; c < 3; c++) {
-//                buttons[c][r].setDisable(true);
-//            }
-//        }
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                buttons[r][c].setDisable(true);
+            }
+        }
     }
 
     public boolean isBoardFull() {
@@ -179,23 +214,28 @@ public class Connect4 extends Application {
                 int col = c;
                 buttons[r][c].setOnAction(actionEvent -> {
                     int newRow = dropToValidPosition(row, col);
-                    System.out.println("newRow: " + newRow);
                     GameButton temp = buttons[newRow][col];
                     if (player == 1) {
-                        temp.setText("X");
                         temp.setStyle("-fx-text-fill: yellow");
                         temp.setStyle("-fx-background-color: yellow");
                         temp.setDisable(true);
                     } else {
-                        temp.setText("O");
                         temp.setStyle("-fx-text-fill: red");
                         temp.setStyle("-fx-background-color: red");
                         temp.setDisable(true);
                     }
-                    System.out.println("for player " + player + ": row -> " + hasEqualRow(newRow, col));
-                    System.out.println("for player " + player + ": col -> " + hasEqualColumn(newRow, col));
+//                    System.out.println("clicked row " + newRow + " col " + col);
+//                    System.out.println("for player " + player + ": row -> " + hasEqualRow(newRow, col));
+//                    System.out.println("for player " + player + ": col -> " + hasEqualColumn(newRow, col));
+                    System.out.println("WonDiagUR: " + WonDiagUR(newRow, col));
+                    System.out.println("WonDiagUL: " + WonDiagUL(newRow, col));
+                    System.out.println("WonDiagDL: " + WonDiagDL(newRow, col));
+                    System.out.println("WonDiagDR: " + WonDiagDR(newRow, col));
+                    System.out.println("Total in DL/UR diagonal: " + (1 + WonDiagUR(newRow, col) + WonDiagDL(newRow, col)));
+                    System.out.println("Total in UL/DR diagonal: " + (1 + WonDiagDR(newRow, col) + WonDiagUL(newRow, col)));
+                    System.out.println("winner: " + winner(newRow, col));
                     temp.setDisable(true);
-                    if (winner()) {
+                    if (winner(newRow, col)) {
                         endGame();
                         listView.getItems().add("Player " + player + " wins");
                     } else if (isBoardFull()) {
@@ -221,12 +261,14 @@ public class Connect4 extends Application {
 
         Button startButton = new Button("Start");
         startButton.setOnAction(e -> {
-            scene = new Scene(vbox, 1000,1000);
+            scene = new Scene(vbox, 900,650);
+            scene.getRoot().setStyle("-fx-font-family: 'arial'");
             primaryStage.setScene(scene);
         });
 
-        scene = new Scene(startButton, 1000, 1000);
+        scene = new Scene(startButton, 500, 500);
 //        scene.getStylesheets().add("stylesheet.css");
+        scene.getRoot().setStyle("-fx-font-family: 'arial'");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
